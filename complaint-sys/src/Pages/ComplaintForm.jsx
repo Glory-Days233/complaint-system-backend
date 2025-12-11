@@ -25,16 +25,34 @@ export default function ComplaintForm() {
   const handleSubmit = (e) => {
     
     e.preventDefault();
-    if (!formData.fullName || !formData.studentId || !formData.email || !formData.complaintType || !formData.description) {
-      setError('Please fill all required fields');
-      return;
-    }
+  
+  if (!formData.fullName || !formData.studentId || !formData.email || !formData.complaintType || !formData.description) {
+    setError('Please fill all required fields');
+    return;
+  }
 
-    console.log('Complaint submitted:', formData);
-    setSuccess('Thank you! Your complaint has been received. We’ll contact you soon.');
-    setError('');
+  // Create a new complaint object
+  const newComplaint = {
+    id: Date.now(),  // simple unique ID
+    name: formData.fullName,
+    studentId: formData.studentId,
+    email: formData.email,
+    phone: formData.phone,
+    department: formData.department,
+    complaint: formData.description,
+    type: formData.complaintType,
+    otherDetails: formData.otherDetails,
+    timestamp: new Date().toISOString(),
+    status: 'pending', // default status
+  };
 
-    // Reset form to blank
+  // Get existing complaints from localStorage
+  const existing = JSON.parse(localStorage.getItem('complaints') || '[]');
+
+  // Add new complaint and save back to localStorage
+  localStorage.setItem('complaints', JSON.stringify([...existing, newComplaint]));
+
+  // Reset form
   setFormData({
     fullName: '',
     studentId: '',
@@ -46,10 +64,9 @@ export default function ComplaintForm() {
     description: '',
   });
 
-  setError('')
-    // Optional: reset form
-    // setFormData({ fullName:'', studentId:'', email:'', phone:'', department:'', complaintType:'', otherDetails:'', description:'' });
-  };
+  setSuccess('Thank you! Your complaint has been received. We’ll contact you soon.');
+  setError('');
+};
 
   return (
     <div className="complaint-page">
