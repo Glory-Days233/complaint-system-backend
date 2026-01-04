@@ -1,31 +1,48 @@
 // src/Pages/AdminLogin.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../css/AdminLogin.css";
 import Logo from "../assets/Logo.jpg";
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // Change these anytime
-    const correctUsername = "admin";
-    const correctPassword = "gctu2025";
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (username !== correctUsername || password !== correctPassword) {
-      setError("Invalid username or password");
-      return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // Store token and admin info
+      localStorage.setItem("adminToken", data.token);
+      localStorage.setItem("adminInfo", JSON.stringify(data.admin));
+      localStorage.setItem("adminLoggedIn", "true");
+
+      navigate("/admin-complaints");
+    } catch (err) {
+      setError("Error connecting to server: " + err.message);
+      setLoading(false);
     }
-
-    // Login success
-    localStorage.setItem("adminLoggedIn", "true");
-    navigate("/admin-complaints");
   };
 
   return (
@@ -38,10 +55,10 @@ const AdminLogin = () => {
 
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
           />
@@ -56,11 +73,13 @@ const AdminLogin = () => {
 
           {error && <div className="error">{error}</div>}
 
-          <button type="submit">Login </button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
 
         <div className="footer">
-          Username: <strong>admin</strong> • Password: <strong>gctu2025</strong>
+          Don't have an account? <Link to="/admin-register">Register here</Link>
         </div>
       </div>
     </div>

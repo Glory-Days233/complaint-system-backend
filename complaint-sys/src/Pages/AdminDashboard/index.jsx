@@ -1,151 +1,282 @@
-// src/Pages/AdminDashboard/index.jsx
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css';   // ← your beautiful CSS
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./AdminDashboard.css";
+import Visual from '../../assets/Visual.png';
 
 export default function AdminDashboard() {
-  const [complaints, setComplaints] = useState([]);
-  const [filter, setFilter] = useState('all');
-  const navigate = useNavigate();
+  const [complaints, setComplaints] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar
 
-  useEffect(() => {
-    if (!localStorage.getItem('adminLoggedIn')) {
-      navigate('/admin-login');
-      return;
-    }
+  const navigate = useNavigate();
 
-    const stored = JSON.parse(localStorage.getItem('complaints') || '[]');
-    setComplaints(stored);
-  }, [navigate]);
+  /* ===============================
+     AUTH + LOAD DATA
+  =============================== */
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("adminLoggedIn");
+    if (!loggedIn) {
+      navigate("/admin-login");
+      return;
+    }
 
-  const handleStatusChange = (id, newStatus) => {
-    const updated = complaints.map(c =>
-      c.id === id ? { ...c, status: newStatus } : c
-    );
-    setComplaints(updated);
-    localStorage.setItem('complaints', JSON.stringify(updated));
-  };
+    const storedComplaints =
+      JSON.parse(localStorage.getItem("complaints")) || [];
+    setComplaints(storedComplaints);
+  }, [navigate]);
 
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this complaint permanently?')) return;
-    const updated = complaints.filter(c => c.id !== id);
-    setComplaints(updated);
-    localStorage.setItem('complaints', JSON.stringify(updated));
-  };
+  /* ===============================
+     ACTIONS
+  =============================== */
+  const handleStatusChange = (id, status) => {
+    const updated = complaints.map((c) =>
+      c.id === id ? { ...c, status } : c
+    );
+    setComplaints(updated);
+    localStorage.setItem("complaints", JSON.stringify(updated));
+  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminLoggedIn');
-    navigate('/admin-login');
-  };
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this complaint permanently?")) return;
+    const updated = complaints.filter((c) => c.id !== id);
+    setComplaints(updated);
+    localStorage.setItem("complaints", JSON.stringify(updated));
+  };
 
-  const filtered = filter === 'all'
-    ? complaints
-    : complaints.filter(c => c.status === filter);
+  const handleLogout = () => {
+    localStorage.removeItem("adminLoggedIn");
+    navigate("/admin-login");
+  };
 
-  return (
-    <div className="dashboard-container">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>Admin Dashboard</h1>
-          <p>Welcome back! Manage student complaints below.</p>
-        </div>
-        <button onClick={handleLogout} className="logout-button">
-          <span>Logout</span>
-        </button>
-      </header>
+  /* ===============================
+     FILTERING
+  =============================== */
+  const filteredComplaints =
+    filter === "all"
+      ? complaints
+      : complaints.filter((c) => c.status === filter);
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card total">
-          <h3>Total</h3>
-          <span className="stat-number">{complaints.length}</span>
-        </div>
-        <div className="stat-card pending">
-          <h3>Pending</h3>
-          <span className="stat-number">{complaints.filter(c => c.status === 'pending').length}</span>
-        </div>
-        <div className="stat-card resolved">
-          <h3>Resolved</h3>
-          <span className="stat-number">{complaints.filter(c => c.status === 'resolved').length}</span>
-        </div>
-      </div>
+  /* ===============================
+     UI
+  =============================== */
+  return (
+    <div className="admin-layout">
 
-      {/* Filters */}
-      <div className="filter-bar">
-        <button
-          className={filter === 'all' ? 'filter-active' : ''}
-          onClick={() => setFilter('all')}
-        >
-          All Complaints
-        </button>
-        <button
-          className={filter === 'pending' ? 'filter-active' : ''}
-          onClick={() => setFilter('pending')}
-        >
-          Pending
-        </button>
-        <button
-          className={filter === 'resolved' ? 'filter-active' : ''}
-          onClick={() => setFilter('resolved')}
-        >
-          Resolved
-        </button>
-      </div>
+      {/* ===============================
+          MOBILE NAVBAR
+      =============================== */}
+      <header className="mobile-navbar">
+        <button
+          className="menu-btn"
+          onClick={() => setSidebarOpen(true)}
+        >
+          ☰
+        </button>
+        <span className="mobile-title">GCTU Admin</span>
+      </header>
 
-      {/* Complaints List */}
-      <div className="complaints-grid">
-        {filtered.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon"></div>
-            <h3>No complaints found</h3>
-            <p>Everything is peaceful for now.</p>
-          </div>
-        ) : (
-          filtered.map(complaint => (
-            <div key={complaint.id} className="complaint-card">
-              <div className="card-header">
-                <h3>{complaint.name || 'Anonymous'}</h3>
-                <span className={`status-badge ${complaint.status}`}>
-                  {complaint.status === 'pending' ? 'Pending' : 'Resolved'}
-                </span>
-              </div>
+      {/* ===============================
+          SIDEBAR (MODIFIED)
+      =============================== */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <img
+            src={Visual}
+            alt="GCTU Logo"
+            className="sidebar-logo-img"
+          />
+          <h2 className="sidebar-logo-text">GCTU Admin</h2>
+            {/* NEW CLOSE BUTTON (Only visible on mobile when sidebar is open) */}
+            <button 
+                className="close-sidebar-btn" 
+                onClick={() => setSidebarOpen(false)}
+            >
+                ×
+            </button>
+        </div>
 
-              <div className="card-body">
-                <p><strong>Student ID:</strong> {complaint.index || complaint.studentId}</p>
-                <p><strong>Department:</strong> {complaint.department || 'Not specified'}</p>
-                <p><strong>Issue:</strong> {complaint.complaint}</p>
-                <p className="timestamp">
-                  {new Date(complaint.timestamp).toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
+        <nav className="sidebar-menu">
+          <button
+            className={filter === "all" ? "active" : ""}
+            onClick={() => {
+              setFilter("all");
+              setSidebarOpen(false); // Close on selection
+            }}
+          >
+            Dashboard
+          </button>
 
-              <div className="card-actions">
-                <select
-                  value={complaint.status}
-                  onChange={(e) => handleStatusChange(complaint.id, e.target.value)}
-                  className="status-dropdown"
-                >
-                  <option value="pending">Mark as Pending</option>
-                  <option value="resolved">Mark as Resolved</option>
-                </select>
-                <button
-                  onClick={() => handleDelete(complaint.id)}
-                  className="delete-button"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
+          <button
+            className={filter === "pending" ? "active" : ""}
+            onClick={() => {
+              setFilter("pending");
+              setSidebarOpen(false); // Close on selection
+            }}
+          >
+            Pending Complaints
+          </button>
+
+          <button
+            className={filter === "resolved" ? "active" : ""}
+            onClick={() => {
+              setFilter("resolved");
+              setSidebarOpen(false); // Close on selection
+            }}
+          >
+            Resolved Complaints
+          </button>
+        </nav>
+
+        <button className="sidebar-logout" onClick={handleLogout}>
+          Logout
+        </button>
+      </aside>
+
+      {/* The rest of the main content and modal remains the same... */}
+
+      <main className="dashboard-main">
+        <header className="dashboard-header">
+          <h1>Admin Dashboard</h1>
+          <p>Manage and review student complaints</p>
+        </header>
+        {/* ... (STATISTICS SECTION) ... */}
+        <section className="stats-grid">
+          <div className="stat-card total">
+            <h3>Total</h3>
+            <span>{complaints.length}</span>
+          </div>
+
+          <div className="stat-card pending">
+            <h3>Pending</h3>
+            <span>{complaints.filter(c => c.status === "pending").length}</span>
+          </div>
+
+          <div className="stat-card resolved">
+            <h3>Resolved</h3>
+            <span>{complaints.filter(c => c.status === "resolved").length}</span>
+          </div>
+        </section>
+        {/* ... (TABLE SECTION) ... */}
+        <section className="complaints-table-container">
+          <table className="complaints-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Issue</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredComplaints.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="empty-table">
+                    No complaints found
+                  </td>
+                </tr>
+              ) : (
+                filteredComplaints.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name}</td>
+                    <td>{c.studentId}</td>
+                    <td>{c.complaint.slice(0, 35)}...</td>
+                    <td>{c.type.join(", ")}</td>
+                    <td>{new Date(c.timestamp).toLocaleDateString()}</td>
+
+                    <td>
+                      <select
+                        value={c.status}
+                        onChange={(e) =>
+                          handleStatusChange(c.id, e.target.value)
+                        }
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="resolved">Resolved</option>
+                      </select>
+                    </td>
+
+                    <td className="action-buttons">
+                      <button
+                        className="view-btn"
+                        onClick={() => setSelectedComplaint(c)}
+                      >
+                        View
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(c.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </section>
+      </main>
+      
+      {/* ... (MODAL SECTION) ... */}
+      {selectedComplaint && (
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedComplaint(null)}
+        >
+          <div
+            className="complaint-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Complaint Details</h2>
+              <button
+                className="close-x"
+                onClick={() => setSelectedComplaint(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-content">
+              <p><strong>Complaint ID:</strong> {selectedComplaint.id}</p>
+              <p><strong>Name:</strong> {selectedComplaint.name}</p>
+              <p><strong>Student ID:</strong> {selectedComplaint.studentId}</p>
+              <p><strong>Email:</strong> {selectedComplaint.email || "N/A"}</p>
+
+              <p>
+                <strong>Issue Type:</strong>
+                {selectedComplaint.type.map((t, i) => (
+                  <span key={i} className="badge">{t}</span>
+                ))}
+              </p>
+
+              <p><strong>Status:</strong> {selectedComplaint.status}</p>
+              <p><strong>Date:</strong> {new Date(selectedComplaint.timestamp).toLocaleString()}</p>
+
+              <div className="complaint-text">
+                <strong>Message:</strong>
+                <p>{selectedComplaint.complaint}</p>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="close-modal"
+                onClick={() => setSelectedComplaint(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
 }
