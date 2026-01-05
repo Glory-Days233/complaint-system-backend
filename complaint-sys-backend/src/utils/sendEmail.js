@@ -13,12 +13,12 @@ const sendEmail = async (options) => {
 
     // Create transporter
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: process.env.SMTP_PORT || 587,
+        host: (process.env.SMTP_HOST || 'smtp.gmail.com').trim(),
+        port: parseInt((process.env.SMTP_PORT || '587').trim()),
         secure: false, // true for 465, false for other ports
         auth: {
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD
+            user: (process.env.SMTP_EMAIL || '').trim(),
+            pass: (process.env.SMTP_PASSWORD || '').trim()
         },
         tls: {
             rejectUnauthorized: false
