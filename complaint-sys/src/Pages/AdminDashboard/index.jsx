@@ -1,20 +1,22 @@
+```javascript
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import API_BASE from '../../api/config';
 import "./AdminDashboard.css";
 import Visual from '../../assets/Visual.png';
 
 export default function AdminDashboard() {
-  const [complaints, setComplaints] = useState([]);
-  const [filter, setFilter] = useState("all");
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar
+  const [complaints, setComplaints] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar
 
-  const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  /* ===============================
-     AUTH + LOAD DATA
-  =============================== */
+  /* ===============================
+   AUTH + LOAD DATA
+  =============================== */
     useEffect(() => {
         const load = async () => {
             const loggedIn = localStorage.getItem("adminLoggedIn");
@@ -25,8 +27,8 @@ export default function AdminDashboard() {
 
             try {
                 const token = localStorage.getItem('adminToken');
-                const res = await fetch(`${API_BASE}/api/complaints`, {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                const res = await fetch(`${ API_BASE } /api/complaints`, {
+                    headers: token ? { Authorization: `Bearer ${ token } ` } : {},
                 });
 
                 if (!res.ok) {
@@ -110,7 +112,7 @@ export default function AdminDashboard() {
       {/* ===============================
           SIDEBAR (MODIFIED)
       =============================== */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+      <aside className={`sidebar ${ sidebarOpen ? "open" : "" } `}>
         <div className="sidebar-header">
           <img
             src={Visual}
