@@ -1,6 +1,7 @@
 // src/Pages/AdminLogin.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import API_BASE from '../api/config';
 import "../css/AdminLogin.css";
 import Logo from "../assets/Logo.jpg";
 
@@ -17,7 +18,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

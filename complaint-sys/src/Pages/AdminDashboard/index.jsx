@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_BASE from '../../api/config';
 import "./AdminDashboard.css";
 import Visual from '../../assets/Visual.png';
 
@@ -14,17 +15,47 @@ export default function AdminDashboard() {
   /* ===============================
      AUTH + LOAD DATA
   =============================== */
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("adminLoggedIn");
-    if (!loggedIn) {
-      navigate("/admin-login");
-      return;
-    }
+    useEffect(() => {
+        const load = async () => {
+            const loggedIn = localStorage.getItem("adminLoggedIn");
+            if (!loggedIn) {
+                navigate("/admin-login");
+                return;
+            }
 
-    const storedComplaints =
-      JSON.parse(localStorage.getItem("complaints")) || [];
-    setComplaints(storedComplaints);
-  }, [navigate]);
+            try {
+                const token = localStorage.getItem('adminToken');
+                const res = await fetch(`${API_BASE}/api/complaints`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+
+                if (!res.ok) {
+                    console.error('Failed to fetch complaints', await res.text());
+                    setComplaints([]);
+                    return;
+                }
+
+                const data = await res.json();
+                // Map backend complaint shape to UI-friendly shape
+                const mapped = data.map((c) => ({
+                    id: c._id,
+                    name: c.name || c.fullName || 'N/A',
+                    studentId: c.studentId || c.phone || 'N/A',
+                    complaint: c.description || c.complaint || c.subject || '',
+                    type: c.category ? [c.category] : (c.type || []),
+                    timestamp: c.createdAt || c.created_at || Date.now(),
+                    status: (c.status || 'pending').toLowerCase(),
+                }));
+
+                setComplaints(mapped);
+            } catch (err) {
+                console.error('Error loading complaints', err);
+                setComplaints([]);
+            }
+        };
+
+        load();
+    }, [navigate]);
 
   /* ===============================
      ACTIONS

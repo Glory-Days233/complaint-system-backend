@@ -1,5 +1,6 @@
 // src/Pages/ComplaintForm.jsx
 import { useState } from 'react';
+import API_BASE from '../api/config';
 import '../css/ComplaintForm.css';
 import emailjs from "@emailjs/browser";
 import Visual from '../assets/Visual.png';
@@ -98,7 +99,7 @@ export default function ComplaintForm() {
 
     try {
       // Send complaint to backend API
-      const response = await fetch('http://localhost:5000/api/complaints', {
+      const response = await fetch(`${API_BASE}/api/complaints`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
