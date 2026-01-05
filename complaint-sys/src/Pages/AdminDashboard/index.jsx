@@ -70,12 +70,44 @@ export default function AdminDashboard() {
     localStorage.setItem("complaints", JSON.stringify(updated));
   };
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Delete this complaint permanently?")) return;
-    const updated = complaints.filter((c) => c.id !== id);
-    setComplaints(updated);
-    localStorage.setItem("complaints", JSON.stringify(updated));
-  };
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("adminToken"); 
+      const res = await fetch(`${ API_BASE } /api/complaints / ${ id } `, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${ token } ` },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
+      setComplaints(complaints.filter((c) => c.id !== id));
+      
+      Swal.fire({
+        title: "Deleted!",
+        text: "The complaint has been deleted.",
+        icon: "success"
+      });
+    } catch (err) {
+      console.error("Error deleting complaint:", err);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete complaint.",
+        icon: "error"
+      });
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminLoggedIn");
