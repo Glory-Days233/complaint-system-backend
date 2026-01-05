@@ -19,8 +19,8 @@
             "destination": "/complaint-sys-backend/server.js"
         },
         {
-            "source": "(.*)",
-            "destination": "/complaint-sys/$1"
+            "source": "/(.*)",
+            "destination": "/complaint-sys/index.html"
         }
     ]
 }
