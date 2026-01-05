@@ -22,8 +22,21 @@ const sendEmail = async (options) => {
         },
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,
+        socketTimeout: 10000
     });
+
+    // Verify connection configuration
+    console.log('Verifying SMTP Connection...');
+    try {
+        await transporter.verify();
+        console.log('SMTP Connection Established Successfully');
+    } catch (verifyError) {
+        console.error('SMTP Connection FAILED:', verifyError);
+        return; // Stop if we can't connect
+    }
 
     // Define email options
     const mailOptions = {
@@ -40,8 +53,6 @@ const sendEmail = async (options) => {
         return info;
     } catch (error) {
         console.error('Error sending email:', error);
-        // We don't throw here to avoid crashing the complaint creation
-        // but we log it clearly
     }
 };
 
