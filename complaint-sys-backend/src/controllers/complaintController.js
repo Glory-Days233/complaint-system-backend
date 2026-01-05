@@ -1,4 +1,5 @@
 const Complaint = require('../models/Complaint');
+const sendEmail = require('../utils/sendEmail');
 
 // Create complaint
 const createComplaint = async (req, res) => {
@@ -22,6 +23,26 @@ const createComplaint = async (req, res) => {
     });
 
     await complaint.save();
+
+    // Send Confirmation Email
+    try {
+      await sendEmail({
+        email: email,
+        subject: 'Complaint Received - GCTU Support',
+        message: `
+                <h1>Complaint Received</h1>
+                <p>Dear ${name},</p>
+                <p>We have received your complaint regarding <strong>${subject}</strong>.</p>
+                <p><strong>Complaint ID:</strong> ${complaint._id}</p>
+                <p>Our team will look into it and get back to you shortly.</p>
+                <p>Best regards,<br>GCTU Support Team</p>
+            `
+      });
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // We continue intentionally, as the transaction was successful
+    }
+
     res.status(201).json({ message: 'Complaint submitted successfully', complaint });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
