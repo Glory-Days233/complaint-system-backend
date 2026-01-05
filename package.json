@@ -1,0 +1,16 @@
+{
+    "name": "complaint-system-root",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "complaint-sys",
+        "complaint-sys-backend"
+    ],
+    "scripts": {
+        "start": "node complaint-sys-backend/server.js",
+        "build": "echo 'Building workspaces...' && npm run build --workspaces"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
