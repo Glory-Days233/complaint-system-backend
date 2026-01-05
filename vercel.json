@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "complaint-sys-backend/server.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "complaint-sys/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/complaint-sys-backend/server.js"
+        },
+        {
+            "source": "(.*)",
+            "destination": "/complaint-sys/$1"
+        }
+    ]
+}
