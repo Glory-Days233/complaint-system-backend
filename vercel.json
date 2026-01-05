@@ -2,10 +2,6 @@
     "version": 2,
     "builds": [
         {
-            "src": "complaint-sys-backend/server.js",
-            "use": "@vercel/node"
-        },
-        {
             "src": "complaint-sys/package.json",
             "use": "@vercel/static-build",
             "config": {
@@ -16,7 +12,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/complaint-sys-backend/server.js"
+            "destination": "https://complaint-system-backend-production.up.railway.app/api/$1"
         },
         {
             "source": "/(.*)",
