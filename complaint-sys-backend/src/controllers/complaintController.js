@@ -84,10 +84,26 @@ const deleteComplaint = async (req, res) => {
   }
 };
 
+// Bulk delete complaints
+const deleteBulkComplaints = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'Please provide an array of IDs' });
+    }
+
+    const result = await Complaint.deleteMany({ _id: { $in: ids } });
+    res.json({ message: 'Complaints deleted successfully', count: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createComplaint,
   getAllComplaints,
   getComplaintById,
   updateComplaintStatus,
   deleteComplaint,
+  deleteBulkComplaints,
 };

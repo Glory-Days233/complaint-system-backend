@@ -5,6 +5,7 @@ const {
   getComplaintById,
   updateComplaintStatus,
   deleteComplaint,
+  deleteBulkComplaints,
 } = require('../controllers/complaintController');
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -23,5 +24,6 @@ router.get('/', authMiddleware, asyncHandler(getAllComplaints));
 router.get('/:id', authMiddleware, asyncHandler(getComplaintById));
 router.put('/:id', authMiddleware, asyncHandler(updateComplaintStatus));
 router.delete('/:id', authMiddleware, asyncHandler(deleteComplaint));
+router.post('/bulk-delete', authMiddleware, asyncHandler(deleteBulkComplaints));
 
 module.exports = router;
