@@ -11,11 +11,14 @@ const sendEmail = async (options) => {
         passSet: !!process.env.SMTP_PASSWORD
     });
 
+    const port = parseInt((process.env.SMTP_PORT || '587').trim());
+    const isSecure = port === 465;
+
     // Create transporter
     const transporter = nodemailer.createTransport({
         host: (process.env.SMTP_HOST || 'smtp.gmail.com').trim(),
-        port: parseInt((process.env.SMTP_PORT || '587').trim()),
-        secure: false, // true for 465, false for other ports
+        port: port,
+        secure: isSecure, // true for 465, false for other ports
         auth: {
             user: (process.env.SMTP_EMAIL || '').trim(),
             pass: (process.env.SMTP_PASSWORD || '').trim()
