@@ -14,7 +14,8 @@ const createComplaint = async (req, res) => {
     // Handle images
     let imagePaths = [];
     if (req.files && req.files.length > 0) {
-      imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+      // With Cloudinary, file.path is the secure URL
+      imagePaths = req.files.map(file => file.path);
     }
 
     if (!name || !email || !phone || !category || !subject || !description || !studentId) {
