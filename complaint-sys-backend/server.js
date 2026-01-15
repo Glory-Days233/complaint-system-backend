@@ -24,6 +24,9 @@ app.use(express.json({
 // Connect to database
 connectDB();
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
