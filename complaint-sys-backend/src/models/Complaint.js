@@ -11,6 +11,11 @@ const complaintSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  studentId: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   phone: {
     type: String,
     required: true,
@@ -59,6 +64,10 @@ const complaintSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
+  },
+  images: {
+    type: [String],
+    default: [],
   },
 });
 

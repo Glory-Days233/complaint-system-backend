@@ -7,19 +7,29 @@ const createComplaint = async (req, res) => {
     // Log incoming request for debugging malformed requests from the frontend
     console.log('Incoming /api/complaints request headers:', req.headers);
     console.log('Incoming /api/complaints request body:', req.body);
-    const { name, email, phone, category, subject, description } = req.body;
+    console.log('Incoming /api/complaints request files:', req.files); // Log files
 
-    if (!name || !email || !phone || !category || !subject || !description) {
+    const { name, email, phone, category, subject, description, studentId } = req.body;
+
+    // Handle images
+    let imagePaths = [];
+    if (req.files && req.files.length > 0) {
+      imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    }
+
+    if (!name || !email || !phone || !category || !subject || !description || !studentId) {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
     const complaint = new Complaint({
       name,
+      studentId,
       email,
       phone,
       category,
       subject,
       description,
+      images: imagePaths, // Add images
     });
 
     await complaint.save();

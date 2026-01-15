@@ -8,6 +8,8 @@ const {
   deleteBulkComplaints,
 } = require('../controllers/complaintController');
 const authMiddleware = require('../middleware/authMiddleware');
+const upload = require('../middleware/upload');
+
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 // Public routes
-router.post('/', asyncHandler(createComplaint));
+router.post('/', upload.array('images', 3), asyncHandler(createComplaint));
 
 // Protected routes
 router.get('/', authMiddleware, asyncHandler(getAllComplaints));
